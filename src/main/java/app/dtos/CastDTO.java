@@ -16,4 +16,9 @@ public class CastDTO {
     private String department;
     @JsonProperty("character")
     private String character; // nullable
+    @JsonProperty("id")
+    private int idFromTmdb;
+    @JsonProperty("name")
+    private String name;
+
 }
