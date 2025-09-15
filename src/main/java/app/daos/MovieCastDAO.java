@@ -1,11 +1,17 @@
 package app.daos;
 
+
 import app.entities.MovieCast;
+import app.persistence.IDao;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.EntityManagerFactory;
 
+
 import java.util.List;
-public class MovieCastDAO implements IDAO<MovieCast, Integer> {
+import java.util.Optional;
+
+
+public class MovieCastDAO implements IDao<MovieCast, Integer> {
 
 
     private final EntityManagerFactory emf;
@@ -28,18 +34,18 @@ public class MovieCastDAO implements IDAO<MovieCast, Integer> {
 
 
     @Override
-    public List<MovieCast> getAll() {
+    public Optional<MovieCast> getById(Integer id) {
         try (EntityManager em = emf.createEntityManager()) {
-            return em.createQuery("SELECT mc FROM MovieCast mc", MovieCast.class)
-                    .getResultList();
+            return Optional.ofNullable(em.find(MovieCast.class, id));
         }
     }
 
 
     @Override
-    public MovieCast getById(Integer id) {
+    public List<MovieCast> getAll() {
         try (EntityManager em = emf.createEntityManager()) {
-            return em.find(MovieCast.class, id);
+            return em.createQuery("SELECT mc FROM MovieCast mc", MovieCast.class)
+                    .getResultList();
         }
     }
 

@@ -1,11 +1,17 @@
 package app.daos;
 
+
 import app.entities.Person;
+import app.persistence.IDao;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.EntityManagerFactory;
 
+
 import java.util.List;
-public class PersonDAO implements IDAO<Person, Integer> {
+import java.util.Optional;
+
+
+public class PersonDAO implements IDao<Person, Integer> {
 
 
     private final EntityManagerFactory emf;
@@ -28,18 +34,18 @@ public class PersonDAO implements IDAO<Person, Integer> {
 
 
     @Override
-    public List<Person> getAll() {
+    public Optional<Person> getById(Integer id) {
         try (EntityManager em = emf.createEntityManager()) {
-            return em.createQuery("SELECT p FROM Person p", Person.class)
-                    .getResultList();
+            return Optional.ofNullable(em.find(Person.class, id));
         }
     }
 
 
     @Override
-    public Person getById(Integer id) {
+    public List<Person> getAll() {
         try (EntityManager em = emf.createEntityManager()) {
-            return em.find(Person.class, id);
+            return em.createQuery("SELECT p FROM Person p", Person.class)
+                    .getResultList();
         }
     }
 

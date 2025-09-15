@@ -1,11 +1,17 @@
 package app.daos;
 
+
 import app.entities.Genre;
+import app.persistence.IDao;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.EntityManagerFactory;
 
+
 import java.util.List;
-public class GenreDAO implements IDAO<Genre, Integer> {
+import java.util.Optional;
+
+
+public class GenreDAO implements IDao<Genre, Integer> {
 
 
     private final EntityManagerFactory emf;
@@ -28,18 +34,18 @@ public class GenreDAO implements IDAO<Genre, Integer> {
 
 
     @Override
-    public List<Genre> getAll() {
+    public Optional<Genre> getById(Integer id) {
         try (EntityManager em = emf.createEntityManager()) {
-            return em.createQuery("SELECT g FROM Genre g", Genre.class)
-                    .getResultList();
+            return Optional.ofNullable(em.find(Genre.class, id));
         }
     }
 
 
     @Override
-    public Genre getById(Integer id) {
+    public List<Genre> getAll() {
         try (EntityManager em = emf.createEntityManager()) {
-            return em.find(Genre.class, id);
+            return em.createQuery("SELECT g FROM Genre g", Genre.class)
+                    .getResultList();
         }
     }
 
