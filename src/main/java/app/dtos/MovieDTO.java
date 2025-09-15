@@ -28,6 +28,5 @@ public class MovieDTO {
     private String overview;
 
     private List<GenreDTO> genres;
-    private List<CastDTO> cast;
     private List<CreditsDTO> credits;
 }
