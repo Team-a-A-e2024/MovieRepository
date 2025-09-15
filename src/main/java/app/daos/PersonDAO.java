@@ -1,0 +1,73 @@
+package app.daos;
+
+import app.entities.Person;
+import jakarta.persistence.EntityManager;
+import jakarta.persistence.EntityManagerFactory;
+
+import java.util.List;
+public class PersonDAO implements IDAO<Person, Integer> {
+
+
+    private final EntityManagerFactory emf;
+
+
+    public PersonDAO(EntityManagerFactory emf) {
+        this.emf = emf;
+    }
+
+
+    @Override
+    public Person create(Person p) {
+        try (EntityManager em = emf.createEntityManager()) {
+            em.getTransaction().begin();
+            em.persist(p);
+            em.getTransaction().commit();
+            return p;
+        }
+    }
+
+
+    @Override
+    public List<Person> getAll() {
+        try (EntityManager em = emf.createEntityManager()) {
+            return em.createQuery("SELECT p FROM Person p", Person.class)
+                    .getResultList();
+        }
+    }
+
+
+    @Override
+    public Person getById(Integer id) {
+        try (EntityManager em = emf.createEntityManager()) {
+            return em.find(Person.class, id);
+        }
+    }
+
+
+    @Override
+    public Person update(Person p) {
+        try (EntityManager em = emf.createEntityManager()) {
+            em.getTransaction().begin();
+            Person merged = em.merge(p);
+            em.getTransaction().commit();
+            return merged;
+        }
+    }
+
+
+    @Override
+    public boolean delete(Integer id) {
+        try (EntityManager em = emf.createEntityManager()) {
+            em.getTransaction().begin();
+            Person p = em.find(Person.class, id);
+            if (p != null) {
+                em.remove(p);
+                em.getTransaction().commit();
+                return true;
+            } else {
+                em.getTransaction().rollback();
+                return false;
+            }
+        }
+    }
+}
