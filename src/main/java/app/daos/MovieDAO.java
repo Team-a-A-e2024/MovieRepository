@@ -2,6 +2,7 @@ package app.daos;
 
 
 import app.entities.Movie;
+import app.exceptions.DatabaseException;
 import app.persistence.IDao;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.EntityManagerFactory;
@@ -25,10 +26,15 @@ public class MovieDAO implements IDao<Movie, Integer> {
     @Override
     public Movie create(Movie m) {
         try (EntityManager em = emf.createEntityManager()) {
-            em.getTransaction().begin();
-            em.persist(m);
-            em.getTransaction().commit();
-            return m;
+            try {
+                em.getTransaction().begin();
+                em.persist(m);
+                em.getTransaction().commit();
+                return m;
+            } catch (DatabaseException e) {
+                em.getTransaction().rollback();
+            }
+            return null;
         }
     }
 
@@ -53,27 +59,33 @@ public class MovieDAO implements IDao<Movie, Integer> {
     @Override
     public Movie update(Movie m) {
         try (EntityManager em = emf.createEntityManager()) {
-            em.getTransaction().begin();
-            Movie merged = em.merge(m);
-            em.getTransaction().commit();
-            return merged;
+            try {
+                em.getTransaction().begin();
+                Movie merged = em.merge(m);
+                em.getTransaction().commit();
+                return merged;
+            } catch (DatabaseException e) {
+                em.getTransaction().rollback();
+            }
+            return null;
         }
     }
-
 
     @Override
     public boolean delete(Integer id) {
         try (EntityManager em = emf.createEntityManager()) {
-            em.getTransaction().begin();
-            Movie m = em.find(Movie.class, id);
-            if (m != null) {
-                em.remove(m);
-                em.getTransaction().commit();
-                return true;
-            } else {
+            try {
+                em.getTransaction().begin();
+                Movie m = em.find(Movie.class, id);
+                if (m != null) {
+                    em.remove(m);
+                    em.getTransaction().commit();
+                    return true;
+                }
+            } catch (DatabaseException e) {
                 em.getTransaction().rollback();
-                return false;
             }
+            return false;
         }
     }
 }
