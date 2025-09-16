@@ -1,27 +1,21 @@
 package app.daos;
 
-
 import app.entities.Movie;
 import app.exceptions.DatabaseException;
 import app.persistence.IDao;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.EntityManagerFactory;
 
-
 import java.util.List;
 import java.util.Optional;
 
-
 public class MovieDAO implements IDao<Movie, Integer> {
 
-
     private final EntityManagerFactory emf;
-
 
     public MovieDAO(EntityManagerFactory emf) {
         this.emf = emf;
     }
-
 
     @Override
     public Movie create(Movie m) {
@@ -38,14 +32,12 @@ public class MovieDAO implements IDao<Movie, Integer> {
         }
     }
 
-
     @Override
     public Optional<Movie> getById(Integer id) {
         try (EntityManager em = emf.createEntityManager()) {
             return Optional.ofNullable(em.find(Movie.class, id));
         }
     }
-
 
     @Override
     public List<Movie> getAll() {
@@ -54,7 +46,6 @@ public class MovieDAO implements IDao<Movie, Integer> {
                     .getResultList();
         }
     }
-
 
     @Override
     public Movie update(Movie m) {

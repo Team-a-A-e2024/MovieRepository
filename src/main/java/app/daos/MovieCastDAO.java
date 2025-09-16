@@ -1,16 +1,13 @@
 package app.daos;
 
-
 import app.entities.MovieCast;
 import app.exceptions.DatabaseException;
 import app.persistence.IDao;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.EntityManagerFactory;
 
-
 import java.util.List;
 import java.util.Optional;
-
 
 public class MovieCastDAO implements IDao<MovieCast, Integer> {
 
@@ -34,7 +31,6 @@ public class MovieCastDAO implements IDao<MovieCast, Integer> {
             return null;
         }
     }
-
 
     @Override
     public Optional<MovieCast> getById(Integer id) {
