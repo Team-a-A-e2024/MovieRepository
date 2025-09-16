@@ -1,12 +1,14 @@
 package app.daos;
 
 import app.entities.Genre;
+import app.entities.Movie;
 import app.exceptions.ApiException;
 import app.exceptions.DatabaseException;
 import app.persistence.IDao;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.EntityManagerFactory;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
@@ -30,6 +32,26 @@ public class GenreDAO implements IDao<Genre, Integer> {
                 em.getTransaction().rollback();
             }
             return null;
+        }
+    }
+
+    public List<Genre> createAll(List<Genre> genreList) {
+        List<Genre> genres = new ArrayList<>();
+        try (EntityManager em = emf.createEntityManager()) {
+            try {
+                em.getTransaction().begin();
+                for (Genre genre : genreList) {
+                    try {
+                        em.persist(genre);
+                        genres.add(genre);
+                    } catch (DatabaseException e) {
+                    }
+                }
+                em.getTransaction().commit();
+            } catch (DatabaseException e) {
+                em.getTransaction().rollback();
+            }
+            return genres;
         }
     }
 

@@ -1,11 +1,13 @@
 package app.daos;
 
+import app.entities.Movie;
 import app.entities.MovieCast;
 import app.exceptions.DatabaseException;
 import app.persistence.IDao;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.EntityManagerFactory;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
@@ -29,6 +31,26 @@ public class MovieCastDAO implements IDao<MovieCast, Integer> {
                 em.getTransaction().rollback();
             }
             return null;
+        }
+    }
+
+    public List<MovieCast> createAll(List<MovieCast> movieCastList) {
+        List<MovieCast> movieCasts = new ArrayList<>();
+        try (EntityManager em = emf.createEntityManager()) {
+            try {
+                em.getTransaction().begin();
+                for (MovieCast movieCast : movieCastList) {
+                    try {
+                        em.persist(movieCast);
+                        movieCasts.add(movieCast);
+                    } catch (DatabaseException e) {
+                    }
+                }
+                em.getTransaction().commit();
+            } catch (DatabaseException e) {
+                em.getTransaction().rollback();
+            }
+            return movieCasts;
         }
     }
 
