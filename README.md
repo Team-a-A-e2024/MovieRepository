@@ -12,3 +12,9 @@ DB_PASSWORD=postgres
 2. Create a database named `movie_repository`
 3. Run `Main` to create a configuration
 3. Edit configuration and insert environment variable named `API_KEY`
+
+
+## Endpoints we have used
+* Discover: Movie; https://api.themoviedb.org/3/discover/movie
+* Genres: Movie List; https://api.themoviedb.org/3/genre/movie/list
+* Movies: Credits; https://api.themoviedb.org/3/movie/{movie_id}/credits 
