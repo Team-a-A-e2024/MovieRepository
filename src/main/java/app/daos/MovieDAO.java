@@ -6,6 +6,7 @@ import app.persistence.IDao;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.EntityManagerFactory;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
@@ -29,6 +30,26 @@ public class MovieDAO implements IDao<Movie, Integer> {
                 em.getTransaction().rollback();
             }
             return null;
+        }
+    }
+
+    public List<Movie> createAll(List<Movie> movieList) {
+        List<Movie> movies = new ArrayList<>();
+        try (EntityManager em = emf.createEntityManager()) {
+            try {
+                em.getTransaction().begin();
+                for (Movie movie : movieList) {
+                    try {
+                        em.persist(movie);
+                        movies.add(movie);
+                    } catch (DatabaseException e) {
+                    }
+                }
+                em.getTransaction().commit();
+            } catch (DatabaseException e) {
+                em.getTransaction().rollback();
+            }
+            return movies;
         }
     }
 
