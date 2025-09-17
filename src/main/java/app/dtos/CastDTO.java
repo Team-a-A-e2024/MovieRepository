@@ -13,7 +13,7 @@ public class CastDTO {
     private int id;
     @JsonProperty("job")
     private String job;
-    @JsonProperty("known_for_department")
+    @JsonProperty("department")
     private String department;
     @JsonProperty("character")
     private String character; // nullable
