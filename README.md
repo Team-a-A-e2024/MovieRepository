@@ -15,6 +15,6 @@ DB_PASSWORD=postgres
 
 
 ## Endpoints we have used
-* Discover: Movie; https://api.themoviedb.org/3/discover/movie
-* Genres: Movie List; https://api.themoviedb.org/3/genre/movie/list
-* Movies: Credits; https://api.themoviedb.org/3/movie/{movie_id}/credits 
+* https://developer.themoviedb.org/reference/discover-movie
+* https://developer.themoviedb.org/reference/genre-movie-list
+* https://developer.themoviedb.org/reference/movie-credits
