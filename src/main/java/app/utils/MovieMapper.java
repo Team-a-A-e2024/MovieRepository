@@ -1,30 +1,15 @@
 package app.utils;
 
-import app.dtos.GenreDTO;
 import app.dtos.MovieDTO;
 import app.entities.Genre;
 import app.entities.Movie;
-import app.services.FetchTools;
-import app.services.GenreService;
 
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
-public class MovieAndGenreMapper {
-
-    public static List<Genre> mapGenreDTOtoGenreEntity(GenreDTO genreDTO) {
-        List<Genre> genres = new ArrayList<>();
-        for(GenreDTO.Genres genre : genreDTO.getGenres()){
-            genres.add(Genre.builder().
-                    id(genre.getId()).
-                    genre(genre.getName()).
-                    build()
-            );
-        }
-        return genres;
-    }
+public class MovieMapper {
 
     public static List<Movie> mapMovieDTOtoMovieEntity(MovieDTO movieDTO, List<Genre> genres){
         List<Movie> movies = new ArrayList<>();
