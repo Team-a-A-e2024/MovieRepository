@@ -1,6 +1,10 @@
 package app.services;
 
 import app.dtos.GenreDTO;
+import app.dtos.MovieDTO;
+import app.entities.Genre;
+
+import java.util.Set;
 
 public class GenreService {
     private final FetchTools fetchTools;
@@ -15,4 +19,5 @@ public class GenreService {
         return "https://api.themoviedb.org/3/genre/movie/list?language=en" +
                 "&api_key=" + System.getenv("API_KEY");
     }
+
 }
