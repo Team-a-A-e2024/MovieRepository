@@ -19,5 +19,4 @@ public class GenreService {
         return "https://api.themoviedb.org/3/genre/movie/list?language=en" +
                 "&api_key=" + System.getenv("API_KEY");
     }
-
 }
