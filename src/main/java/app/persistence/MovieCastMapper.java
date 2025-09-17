@@ -10,7 +10,7 @@ import java.util.List;
 
 public class MovieCastMapper {
 
-    public static List<MovieCast> mapCastDTOtoMovieCastEntity(List<CastDTO> castDTOs, Movie movie, List<Person> persons) {
+    public static List<MovieCast> CastDTOtoMovieCastEntityMapper(List<CastDTO> castDTOs, Movie movie, List<Person> persons) {
         List<MovieCast> movieCasts = new ArrayList<>();
 
         for (CastDTO cast : castDTOs) {
