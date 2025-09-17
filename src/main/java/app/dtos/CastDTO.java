@@ -16,7 +16,7 @@ public class CastDTO {
     @JsonProperty("department")
     private String department;
     @JsonProperty("character")
-    private String character; // nullable
+    private String character;
     @JsonProperty("name")
     private String name;
 
