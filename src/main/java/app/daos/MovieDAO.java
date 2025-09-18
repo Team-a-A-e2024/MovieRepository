@@ -1,5 +1,6 @@
 package app.daos;
 
+import app.entities.Genre;
 import app.entities.Movie;
 import app.exceptions.DatabaseException;
 import app.persistence.IDao;
@@ -42,7 +43,7 @@ public class MovieDAO implements IDao<Movie, Integer> {
                     try {
                         em.persist(movie);
                         movies.add(movie);
-                    } catch (DatabaseException e) {
+                    } catch (Exception e) {
                     }
                 }
                 em.getTransaction().commit();
@@ -64,6 +65,14 @@ public class MovieDAO implements IDao<Movie, Integer> {
     public List<Movie> getAll() {
         try (EntityManager em = emf.createEntityManager()) {
             return em.createQuery("SELECT m FROM Movie m", Movie.class)
+                    .getResultList();
+        }
+    }
+
+    public List<Movie> getAllByGenre(Genre genre) {
+        try (EntityManager em = emf.createEntityManager()) {
+            return em.createQuery("SELECT g.movies FROM Genre g where g.id = :value", Movie.class)
+                    .setParameter("value", genre.getId())
                     .getResultList();
         }
     }

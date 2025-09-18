@@ -5,7 +5,6 @@ import app.dtos.MovieDTO;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.concurrent.*;
 
 public class MovieService {
     private final FetchTools fetchTools;
@@ -16,31 +15,17 @@ public class MovieService {
 
     public List<MovieDTO.Movie> getRecentDanishMoviesInfo()  {
         List<MovieDTO.Movie> movies = new ArrayList<>();
+        List<String> endpoints = new ArrayList<>();
+
         MovieDTO movieDTO = fetchTools.getFromApi(discoverMovieUri(1), MovieDTO.class);
         int totalPages = movieDTO.getTotalPages();
 
-        int cores = Runtime.getRuntime().availableProcessors();
-        int threadPoolSize = Math.min(totalPages, cores);
-        ExecutorService executorService = Executors.newFixedThreadPool(threadPoolSize);
-
-        List<Callable<MovieDTO>> tasks = new ArrayList<>();
-
         for (int i = 1; i <= totalPages; i++) {
-            int finalI = i;
-            tasks.add(() -> fetchTools.getFromApi(discoverMovieUri(finalI), MovieDTO.class));
+            endpoints.add(discoverMovieUri(i));
         }
 
-        try {
-            List<Future<MovieDTO>> futures = executorService.invokeAll(tasks);
-
-            for (Future<MovieDTO> future : futures) {
-                MovieDTO response = future.get();
-                movies.addAll(response.getResults());
-            }
-
-        } catch (InterruptedException | ExecutionException e) {
-            throw new RuntimeException(e);
-        }
+        List<MovieDTO> movieDTOs = fetchTools.getFromApiList(endpoints, MovieDTO.class);
+        movieDTOs.forEach(x -> movies.addAll(x.getResults()));
 
         return movies;
     }

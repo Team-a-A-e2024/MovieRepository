@@ -16,7 +16,7 @@ public class MovieCast {
     private Integer id;
     private String job;
     private String department;
-    private String Character;
+    private String character;
 
     //relation
     @ManyToOne
