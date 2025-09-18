@@ -7,12 +7,14 @@ import java.util.HashSet;
 import java.util.Set;
 
 @Getter
+
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
 @ToString
 @EqualsAndHashCode
 @Entity
+
 public class Genre {
     @Id
     private Integer id;

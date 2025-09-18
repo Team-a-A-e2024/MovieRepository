@@ -24,13 +24,13 @@ public class MovieCastDAO implements IDao<MovieCast, Integer> {
         try (EntityManager em = emf.createEntityManager()) {
             try {
                 em.getTransaction().begin();
-                em.persist(mc);
+                MovieCast managed = em.merge(mc);
                 em.getTransaction().commit();
-                return mc;
+                return managed;
             } catch (DatabaseException e) {
                 em.getTransaction().rollback();
+                throw e;
             }
-            return null;
         }
     }
 
