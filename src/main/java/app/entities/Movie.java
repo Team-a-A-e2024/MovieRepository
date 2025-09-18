@@ -25,7 +25,7 @@ public class Movie {
     private String overview;
 
     //relations
-    @OneToMany (mappedBy = "movie", fetch = FetchType.EAGER)
+    @OneToMany (mappedBy = "movie", cascade = CascadeType.ALL, fetch = FetchType.EAGER)
     @Builder.Default
     @EqualsAndHashCode.Exclude
     private Set<MovieCast> casts = new HashSet<>();
