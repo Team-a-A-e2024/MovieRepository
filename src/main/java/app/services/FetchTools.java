@@ -1,6 +1,5 @@
 package app.services;
 
-import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
@@ -9,6 +8,9 @@ import java.net.URI;
 import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.concurrent.*;
 
 public class FetchTools {
 
@@ -39,5 +41,34 @@ public class FetchTools {
             e.printStackTrace();
         }
         return null;
+    }
+
+    public <T> List<T> getFromApiList(List<String> endpoints, Class<T> dto) {
+        List<T> responses = new ArrayList<>();
+        List<Callable<T>> tasks = new ArrayList<>();
+        ExecutorService executorService = createThreadPool(endpoints.size());
+
+        for (String endpoint : endpoints) {
+            tasks.add(() -> getFromApi(endpoint, dto));
+        }
+
+        try {
+            List<Future<T>> futures = executorService.invokeAll(tasks);
+
+            for (Future<T> future : futures) {
+                responses.add(future.get());
+            }
+        } catch (InterruptedException | ExecutionException e) {
+            throw new RuntimeException(e);
+        } finally {
+            executorService.shutdown();
+        }
+
+        return responses;
+    }
+
+    private static ExecutorService createThreadPool(int threadPoolSize) {
+        int cores = Runtime.getRuntime().availableProcessors();
+        return Executors.newFixedThreadPool(Math.min(threadPoolSize, cores));
     }
 }
