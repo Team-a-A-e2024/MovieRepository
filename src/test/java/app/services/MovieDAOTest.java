@@ -3,82 +3,92 @@ package app.services;
 import app.config.HibernateConfig;
 import app.daos.MovieDAO;
 import app.entities.Movie;
+import app.populators.MoviePopulatorTest;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.EntityManagerFactory;
-import jakarta.persistence.Persistence;
 import org.junit.jupiter.api.*;
 
-import java.time.LocalDate;
 import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.*;
 
+@TestInstance(TestInstance.Lifecycle.PER_CLASS)
 class MovieDAOTest {
 
     private static EntityManagerFactory emf;
     private MovieDAO movieDAO;
 
-        @BeforeAll
-        static void setupOnce() {
-            emf = HibernateConfig.getEntityManagerFactoryForTest();
-        }
+    @BeforeAll
+    void setupOnce() {
+        HibernateConfig.setTest(true);
+        emf = HibernateConfig.getEntityManagerFactoryForTest();
+    }
 
+    @AfterAll
+    void tearDownOnce() {
+        if (emf != null) emf.close();
+    }
 
     @BeforeEach
     void setup() {
         movieDAO = new MovieDAO(emf);
-
         EntityManager em = emf.createEntityManager();
-        em.getTransaction().begin();
-        em.createQuery("DELETE FROM Movie").executeUpdate();
-
-        em.persist(Movie.builder().title("The Matrix").rating(8.7).releaseDate(LocalDate.of(1999,3,31)).build());
-        em.persist(Movie.builder().title("Inception").rating(8.5).releaseDate(LocalDate.of(2010,7,16)).build());
-        em.persist(Movie.builder().title("The Room").rating(3.7).releaseDate(LocalDate.of(2003,6,27)).build());
-        em.persist(Movie.builder().title("Frozen").rating(7.5).releaseDate(LocalDate.of(2013,11,27)).build());
-
-        em.getTransaction().commit();
+        MoviePopulatorTest.populate(em);
         em.close();
     }
 
-    @AfterAll
-    static void tearDownOnce() {
-        emf.close();
-    }
     @Test
+    @Tag("integration")
     void searchByTitle() {
-
         List<Movie> results = movieDAO.searchByTitle("matrix");
 
         assertNotNull(results);
-
         assertEquals(1, results.size());
-        assertEquals("The Matrix", results.get(0).getTitle());
+
+        Movie movie = results.get(0);
+        assertEquals(MoviePopulatorTest.matrix.getImdbID(), movie.getImdbID());
+        assertEquals(MoviePopulatorTest.matrix.getTitle(), movie.getTitle());
+        assertEquals(MoviePopulatorTest.matrix.getOverview(), movie.getOverview());
+        assertEquals(MoviePopulatorTest.matrix.getRating(), movie.getRating());
+        assertEquals(MoviePopulatorTest.matrix.getReleaseDate(), movie.getReleaseDate());
     }
 
     @Test
+    @Tag("integration")
     void testGetAverageRating() {
-        Double avg = movieDAO.getAverageRating();
+        double avg = movieDAO.getAverageRating();
+        double expected = (MoviePopulatorTest.matrix.getRating()
+                + MoviePopulatorTest.inception.getRating()
+                + MoviePopulatorTest.room.getRating()
+                + MoviePopulatorTest.frozen.getRating()) / 4.0;
 
-        double expected = (8.7 + 8.5 + 3.7 + 7.5) / 4;
-
-        assertNotNull(avg);
         assertEquals(expected, avg, 0.001);
     }
 
     @Test
-    void testTop10HighestRated() {
-        List<Movie> top = movieDAO.getTop10HighestRated();
+    @Tag("integration")
+    void testTopRatedMovies() {
+        List<Movie> results = movieDAO.getTop10HighestRated();
 
-        assertEquals("The Matrix", top.get(0).getTitle());
-        assertEquals("Inception", top.get(1).getTitle());
+        assertEquals(4, results.size());
+
+        assertEquals(MoviePopulatorTest.matrix.getTitle(), results.get(0).getTitle());
+        assertEquals(MoviePopulatorTest.inception.getTitle(), results.get(1).getTitle());
+        assertEquals(MoviePopulatorTest.frozen.getTitle(), results.get(2).getTitle());
+        assertEquals(MoviePopulatorTest.room.getTitle(), results.get(3).getTitle());
     }
 
     @Test
-    void testTop10LowestRated() {
-        List<Movie> low = movieDAO.getTop10LowestRated();
+    @Tag("integration")
+    void testLowestRatedMovies() {
+        List<Movie> results = movieDAO.getTop10LowestRated();
 
-        assertEquals("The Room", low.get(0).getTitle());
-        assertEquals("Frozen", low.get(1).getTitle());
+        assertEquals(4, results.size());
+
+        assertEquals(MoviePopulatorTest.room.getTitle(), results.get(0).getTitle());
+        assertEquals(MoviePopulatorTest.frozen.getTitle(), results.get(1).getTitle());
+        assertEquals(MoviePopulatorTest.inception.getTitle(), results.get(2).getTitle());
+        assertEquals(MoviePopulatorTest.matrix.getTitle(), results.get(3).getTitle());
     }
+
 }
