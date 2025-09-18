@@ -19,5 +19,4 @@ public class CastDTO {
     private String character;
     @JsonProperty("name")
     private String name;
-
 }

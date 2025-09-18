@@ -1,6 +1,5 @@
 package app.daos;
 
-import app.entities.Movie;
 import app.entities.MovieCast;
 import app.exceptions.DatabaseException;
 import app.persistence.IDao;
@@ -43,7 +42,7 @@ public class MovieCastDAO implements IDao<MovieCast, Integer> {
                     try {
                         em.persist(movieCast);
                         movieCasts.add(movieCast);
-                    } catch (DatabaseException e) {
+                    } catch (Exception e) {
                     }
                 }
                 em.getTransaction().commit();
