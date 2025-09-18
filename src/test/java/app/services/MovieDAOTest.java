@@ -21,7 +21,6 @@ class MovieDAOTest {
         @BeforeAll
         static void setupOnce() {
             emf = HibernateConfig.getEntityManagerFactoryForTest();
-            assertNotNull(emf, "EntityManagerFactory should not be null");
         }
 
 

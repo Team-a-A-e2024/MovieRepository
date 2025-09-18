@@ -130,5 +130,4 @@ public class MovieDAO implements IDao<Movie, Integer> {
                     .getResultList();
         }
     }
-
 }
