@@ -12,6 +12,7 @@ import java.util.List;
 import static org.junit.jupiter.api.Assertions.*;
 
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
+@Tag("IntegrationTest")
 class MovieDAOTest {
 
     private static EntityManagerFactory emf;
@@ -37,7 +38,6 @@ class MovieDAOTest {
     }
 
     @Test
-    @Tag("integration")
     void searchByTitle() {
         List<Movie> results = movieDAO.searchByTitle("The Matrix");
 
@@ -49,7 +49,6 @@ class MovieDAOTest {
     }
 
     @Test
-    @Tag("integration")
     void testGetAverageRating() {
         double avg = movieDAO.getAverageRating();
         double expected = (MoviePopulatorTest.matrix.getRating()
@@ -61,7 +60,6 @@ class MovieDAOTest {
     }
 
     @Test
-    @Tag("integration")
     void testTopRatedMovies() {
         List<Movie> results = movieDAO.getTop10HighestRated();
 
