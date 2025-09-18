@@ -67,15 +67,15 @@ class MovieDAOTest {
 
         assertEquals(4, results.size());
 
-        Movie first = results.get(0);
-        Movie second = results.get(1);
-        Movie third = results.get(2);
-        Movie fourth = results.get(3);
+        Movie m1 = results.get(0);
+        Movie m2 = results.get(1);
+        Movie m3 = results.get(2);
+        Movie m4 = results.get(3);
 
-        assertEquals(MoviePopulatorTest.matrix, first);
-        assertEquals(MoviePopulatorTest.inception, second);
-        assertEquals(MoviePopulatorTest.frozen, third);
-        assertEquals(MoviePopulatorTest.room, fourth);
+        assertEquals(MoviePopulatorTest.matrix, m1);
+        assertEquals(MoviePopulatorTest.inception, m2);
+        assertEquals(MoviePopulatorTest.frozen, m3);
+        assertEquals(MoviePopulatorTest.room, m4);
     }
 
     @Test
@@ -85,14 +85,14 @@ class MovieDAOTest {
 
         assertEquals(4, results.size());
 
-        Movie first = results.get(0);
-        Movie second = results.get(1);
-        Movie third = results.get(2);
-        Movie fourth = results.get(3);
+        Movie m1 = results.get(0);
+        Movie m2 = results.get(1);
+        Movie m3 = results.get(2);
+        Movie m4 = results.get(3);
 
-        assertEquals(MoviePopulatorTest.room, first);
-        assertEquals(MoviePopulatorTest.frozen, second);
-        assertEquals(MoviePopulatorTest.inception, third);
-        assertEquals(MoviePopulatorTest.matrix, fourth);
+        assertEquals(MoviePopulatorTest.room, m1);
+        assertEquals(MoviePopulatorTest.frozen, m2);
+        assertEquals(MoviePopulatorTest.inception, m3);
+        assertEquals(MoviePopulatorTest.matrix, m4);
     }
 }
