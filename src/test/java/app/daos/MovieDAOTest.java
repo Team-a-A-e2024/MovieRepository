@@ -1,7 +1,6 @@
-package app.services;
+package app.daos;
 
 import app.config.HibernateConfig;
-import app.daos.MovieDAO;
 import app.entities.Movie;
 import app.populators.MoviePopulatorTest;
 import jakarta.persistence.EntityManager;
