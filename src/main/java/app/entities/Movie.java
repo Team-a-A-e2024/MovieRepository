@@ -16,16 +16,16 @@ import java.util.Set;
 @Entity
 public class Movie {
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;
     private String imdbID;
     private Double rating;
     private LocalDate releaseDate;
     private String title;
+    @Column(length=1024)
     private String overview;
 
     //relations
-    @OneToMany (mappedBy = "movie", cascade = CascadeType.ALL, fetch = FetchType.EAGER)
+    @OneToMany (mappedBy = "movie", fetch = FetchType.EAGER)
     @Builder.Default
     @EqualsAndHashCode.Exclude
     private Set<MovieCast> casts = new HashSet<>();
