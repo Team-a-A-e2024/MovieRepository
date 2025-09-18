@@ -39,17 +39,13 @@ class MovieDAOTest {
     @Test
     @Tag("integration")
     void searchByTitle() {
-        List<Movie> results = movieDAO.searchByTitle("matrix");
+        List<Movie> results = movieDAO.searchByTitle("The Matrix");
 
         assertNotNull(results);
         assertEquals(1, results.size());
 
         Movie movie = results.get(0);
-        assertEquals(MoviePopulatorTest.matrix.getImdbID(), movie.getImdbID());
-        assertEquals(MoviePopulatorTest.matrix.getTitle(), movie.getTitle());
-        assertEquals(MoviePopulatorTest.matrix.getOverview(), movie.getOverview());
-        assertEquals(MoviePopulatorTest.matrix.getRating(), movie.getRating());
-        assertEquals(MoviePopulatorTest.matrix.getReleaseDate(), movie.getReleaseDate());
+        assertEquals(MoviePopulatorTest.matrix, movie);
     }
 
     @Test
@@ -71,10 +67,15 @@ class MovieDAOTest {
 
         assertEquals(4, results.size());
 
-        assertEquals(MoviePopulatorTest.matrix.getTitle(), results.get(0).getTitle());
-        assertEquals(MoviePopulatorTest.inception.getTitle(), results.get(1).getTitle());
-        assertEquals(MoviePopulatorTest.frozen.getTitle(), results.get(2).getTitle());
-        assertEquals(MoviePopulatorTest.room.getTitle(), results.get(3).getTitle());
+        Movie first = results.get(0);
+        Movie second = results.get(1);
+        Movie third = results.get(2);
+        Movie fourth = results.get(3);
+
+        assertEquals(MoviePopulatorTest.matrix, first);
+        assertEquals(MoviePopulatorTest.inception, second);
+        assertEquals(MoviePopulatorTest.frozen, third);
+        assertEquals(MoviePopulatorTest.room, fourth);
     }
 
     @Test
@@ -84,10 +85,14 @@ class MovieDAOTest {
 
         assertEquals(4, results.size());
 
-        assertEquals(MoviePopulatorTest.room.getTitle(), results.get(0).getTitle());
-        assertEquals(MoviePopulatorTest.frozen.getTitle(), results.get(1).getTitle());
-        assertEquals(MoviePopulatorTest.inception.getTitle(), results.get(2).getTitle());
-        assertEquals(MoviePopulatorTest.matrix.getTitle(), results.get(3).getTitle());
-    }
+        Movie first = results.get(0);
+        Movie second = results.get(1);
+        Movie third = results.get(2);
+        Movie fourth = results.get(3);
 
+        assertEquals(MoviePopulatorTest.room, first);
+        assertEquals(MoviePopulatorTest.frozen, second);
+        assertEquals(MoviePopulatorTest.inception, third);
+        assertEquals(MoviePopulatorTest.matrix, fourth);
+    }
 }
