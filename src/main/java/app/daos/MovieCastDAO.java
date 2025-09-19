@@ -1,6 +1,5 @@
 package app.daos;
 
-import app.dtos.MovieDTO;
 import app.entities.MovieCast;
 import app.entities.Person;
 import app.exceptions.DatabaseException;

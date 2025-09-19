@@ -13,6 +13,7 @@ import java.util.Set;
 @ToString
 @EqualsAndHashCode
 @Entity
+
 public class Genre {
     @Id
     private Integer id;
