@@ -17,7 +17,7 @@ public class PersonMapper {
 
         for (CastDTO cast : castDTOs) {
             persons.add(Person.builder()
-                    .externalId(cast.getId())
+                    .id(cast.getId())
                     .name(cast.getName())
                     .build()
             );
@@ -30,7 +30,7 @@ public class PersonMapper {
 
         for (CrewDTO cast : dto) {
             persons.add(Person.builder()
-                    .externalId(cast.getId())
+                    .id(cast.getId())
                     .name(cast.getName())
                     .build()
             );

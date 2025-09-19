@@ -2,6 +2,7 @@ package app.daos;
 
 import app.dtos.MovieDTO;
 import app.entities.MovieCast;
+import app.entities.Person;
 import app.exceptions.DatabaseException;
 import app.persistence.IDao;
 import jakarta.persistence.EntityManager;
@@ -24,6 +25,12 @@ public class MovieCastDAO implements IDao<MovieCast, Integer> {
         try (EntityManager em = emf.createEntityManager()) {
             try {
                 em.getTransaction().begin();
+                if(mc.getPerson() != null){
+                    Person existing = em.find(Person.class, mc.getPerson().getId());
+                    if (existing == null){
+                        em.persist(mc.getPerson());
+                    }
+                }
                 em.persist(mc);
                 em.getTransaction().commit();
                 return mc;
@@ -42,7 +49,15 @@ public class MovieCastDAO implements IDao<MovieCast, Integer> {
                 for (MovieCast movieCast : movieCastList) {
                     try {
                         MovieCast managed;
-
+                        if(movieCast.getPerson() != null){
+                            Person existing = em.find(Person.class, movieCast.getPerson().getId());
+                            if (existing == null){
+                                em.persist(movieCast.getPerson());
+                            }
+                            else{
+                                movieCast.setPerson(existing);
+                            }
+                        }
                         if (movieCast.getId() != null) {
                             MovieCast existing = em.find(MovieCast.class, movieCast.getId());
                             if (existing != null) {

@@ -44,6 +44,7 @@ public class MovieCastMapper {
             movieCasts.add(MovieCast.builder()
                     .job(crew.getJob())
                     .department(crew.getDepartment())
+                    .movie(movie)
                     .person(person)
                     .build());
         }

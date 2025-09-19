@@ -23,12 +23,20 @@ public class PersonDAO implements IDao<Person, Integer> {
         try (EntityManager em = emf.createEntityManager()) {
             try {
                 em.getTransaction().begin();
-                em.persist(p);
+                Person existing = em.find(Person.class, p.getId());
+                if (existing == null){
+                    em.persist(p);
+                    return p;
+                }
                 em.getTransaction().commit();
-                return p;
             } catch (DatabaseException e) {
                 em.getTransaction().rollback();
+            } catch (Exception e){
+                e.printStackTrace();
+                System.out.println(p);
+                throw new RuntimeException(e.toString());
             }
+
             return null;
         }
     }

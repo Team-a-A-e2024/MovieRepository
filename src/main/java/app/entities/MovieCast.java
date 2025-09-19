@@ -26,6 +26,7 @@ public class MovieCast {
     private Movie movie;
 
     @ManyToOne
+    //@JoinColumn(referencedColumnName = "externalid")
     @Setter
     private Person person;
 }

@@ -43,18 +43,25 @@ public class Main {
         CreditsService creditsService = new CreditsService(fetchTools);
         MovieService movieService = new MovieService(fetchTools);
 
+        System.out.println("fetching genres");
         GenreDTO genreDTO = genreService.getGenresInfo();
+        System.out.println("fetching movies");
         List<MovieDTO.Movie> movieDTOs = movieService.getRecentDanishMoviesInfo();
+        System.out.println("fetching credits");
         List<CreditsDTO> creditsDTOs = creditsService.getAllCreditsInfo(movieDTOs);
 
+        System.out.println("mapping genres");
         List<Genre> genres = GenreMapper.mapGenreDTOtoGenreEntity(genreDTO);
+        System.out.println("mapping movies");
         List<Movie> movies = MovieMapper.mapMovieDTOtoMovieEntity(movieDTOs, genres);
-        Set<Person> persons = PersonMapper.mapCreditsDTOsToPersonSet(creditsDTOs);
+        System.out.println("mapping casts");
         List<MovieCast> casts = MovieCastMapper.creditsDTOListToMovieCastList(creditsDTOs, movies);
 
+        System.out.println("adding genres");
         genreDAO.createAll(genres);
+        System.out.println("adding movies");
         movieDAO.createAll(movies);
-        persons.forEach(personDAO::create);
+        System.out.println("adding cast");
         movieCastDAO.createAll(casts);
 
         emf.close();

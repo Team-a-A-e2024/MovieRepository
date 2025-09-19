@@ -15,9 +15,7 @@ import java.util.Set;
 @Entity
 public class Person {
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;
-    private Integer externalId;
     private String name;
 
     //relations
