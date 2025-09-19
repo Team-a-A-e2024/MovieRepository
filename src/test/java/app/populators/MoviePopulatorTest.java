@@ -1,8 +1,6 @@
 package app.populators;
-
 import app.entities.Movie;
 import jakarta.persistence.EntityManager;
-
 import java.time.LocalDate;
 
 public class MoviePopulatorTest {
@@ -14,8 +12,6 @@ public class MoviePopulatorTest {
 
     public static void populate(EntityManager em) {
         em.getTransaction().begin();
-        em.createQuery("DELETE FROM Movie").executeUpdate();
-
         matrix = Movie.builder()
                 .title("The Matrix")
                 .imdbID("tt0133093")

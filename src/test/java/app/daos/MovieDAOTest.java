@@ -33,12 +33,15 @@ class MovieDAOTest {
     void setup() {
         movieDAO = new MovieDAO(emf);
         EntityManager em = emf.createEntityManager();
+        em.getTransaction().begin();
+        em.createQuery("DELETE FROM Movie").executeUpdate();
+        em.getTransaction().commit();
+
         MoviePopulatorTest.populate(em);
         em.close();
     }
 
     @Test
-    @Tag("IntegrationTest")
     void searchByTitle() {
         List<Movie> results = movieDAO.searchByTitle("The Matrix");
 
@@ -50,7 +53,6 @@ class MovieDAOTest {
     }
 
     @Test
-    @Tag("IntegrationTest")
     void testGetAverageRating() {
         double avg = movieDAO.getAverageRating();
         double expected = (MoviePopulatorTest.matrix.getRating()
@@ -62,7 +64,6 @@ class MovieDAOTest {
     }
 
     @Test
-    @Tag("IntegrationTest")
     void testTopRatedMovies() {
         List<Movie> results = movieDAO.getTop10HighestRated();
 
@@ -80,7 +81,6 @@ class MovieDAOTest {
     }
 
     @Test
-    @Tag("IntegrationTest")
     void testLowestRatedMovies() {
         List<Movie> results = movieDAO.getTop10LowestRated();
 

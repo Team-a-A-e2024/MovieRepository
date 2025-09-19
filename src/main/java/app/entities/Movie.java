@@ -16,6 +16,7 @@ import java.util.Set;
 @Entity
 public class Movie {
     @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;
     private String imdbID;
     private Double rating;
