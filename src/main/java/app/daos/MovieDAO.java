@@ -119,4 +119,34 @@ public class MovieDAO implements IDao<Movie, Integer> {
             return false;
         }
     }
+    public List<Movie> searchByTitle(String title) {
+        try (EntityManager em = emf.createEntityManager()) {
+            return em.createQuery(
+                            "SELECT m FROM Movie m WHERE LOWER(m.title) LIKE LOWER(:title)", Movie.class)
+                    .setParameter("title", "%" + title + "%")
+                    .getResultList();
+        }
+    }
+    public Double getAverageRating() {
+        try (EntityManager em = emf.createEntityManager()) {
+            return em.createQuery(
+                    "SELECT AVG(m.rating) FROM Movie m", Double.class).getSingleResult();
+        }
+    }
+    public List<Movie> getTop10HighestRated() {
+        try (EntityManager em = emf.createEntityManager()) {
+            return em.createQuery(
+                            "SELECT m FROM Movie m ORDER BY m.rating DESC", Movie.class)
+                    .setMaxResults(10)
+                    .getResultList();
+        }
+    }
+    public List<Movie> getTop10LowestRated() {
+        try (EntityManager em = emf.createEntityManager()) {
+            return em.createQuery(
+                            "SELECT m FROM Movie m ORDER BY m.rating ASC", Movie.class)
+                    .setMaxResults(10)
+                    .getResultList();
+        }
+    }
 }
