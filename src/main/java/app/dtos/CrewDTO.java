@@ -8,11 +8,13 @@ import lombok.ToString;
 @Data
 @ToString
 @JsonIgnoreProperties(ignoreUnknown = true)
-public class CastDTO {
+public class CrewDTO {
     @JsonProperty("id")
     private int id;
-    @JsonProperty("character")
-    private String character;
+    @JsonProperty("job")
+    private String job;
+    @JsonProperty("department")
+    private String department;
     @JsonProperty("name")
     private String name;
 }
