@@ -23,13 +23,19 @@ public class MovieCastDAO implements IDao<MovieCast, Integer> {
         try (EntityManager em = emf.createEntityManager()) {
             try {
                 em.getTransaction().begin();
-                MovieCast managed = em.merge(mc);
+                if(mc.getPerson() != null){
+                    Person existing = em.find(Person.class, mc.getPerson().getId());
+                    if (existing == null){
+                        em.persist(mc.getPerson());
+                    }
+                }
+                em.persist(mc);
                 em.getTransaction().commit();
-                return managed;
+                return mc;
             } catch (DatabaseException e) {
                 em.getTransaction().rollback();
-                throw e;
             }
+            return null;
         }
     }
 
@@ -40,9 +46,32 @@ public class MovieCastDAO implements IDao<MovieCast, Integer> {
                 em.getTransaction().begin();
                 for (MovieCast movieCast : movieCastList) {
                     try {
-                        em.persist(movieCast);
-                        movieCasts.add(movieCast);
+                        MovieCast managed;
+                        if(movieCast.getPerson() != null){
+                            Person existing = em.find(Person.class, movieCast.getPerson().getId());
+                            if (existing == null){
+                                em.persist(movieCast.getPerson());
+                            }
+                            else{
+                                movieCast.setPerson(existing);
+                            }
+                        }
+                        if (movieCast.getId() != null) {
+                            MovieCast existing = em.find(MovieCast.class, movieCast.getId());
+                            if (existing != null) {
+                                managed = em.merge(movieCast);
+                            } else {
+                                em.persist(movieCast);
+                                managed = movieCast;
+                            }
+                        } else {
+                            em.persist(movieCast);
+                            managed = movieCast;
+                        }
+
+                        movieCasts.add(managed);
                     } catch (Exception e) {
+                        System.out.println(e.getMessage());
                     }
                 }
                 em.getTransaction().commit();
