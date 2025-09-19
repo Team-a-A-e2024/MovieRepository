@@ -31,10 +31,6 @@ public class PersonDAO implements IDao<Person, Integer> {
                 em.getTransaction().commit();
             } catch (DatabaseException e) {
                 em.getTransaction().rollback();
-            } catch (Exception e){
-                e.printStackTrace();
-                System.out.println(p);
-                throw new RuntimeException(e.toString());
             }
 
             return null;
