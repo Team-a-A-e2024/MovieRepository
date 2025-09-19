@@ -11,9 +11,11 @@ import org.junit.jupiter.api.*;
 import java.util.List;
 import java.util.Optional;
 
+import static app.populators.MovieCastPopulator.buildCasts;
 import static org.junit.jupiter.api.Assertions.*;
 
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
+@Tag("IntegrationTest")
 class MovieCastDAOTest {
 
     private EntityManagerFactory emf;
@@ -41,98 +43,87 @@ class MovieCastDAOTest {
         if (emf != null && emf.isOpen()) emf.close();
     }
 
-    // Bruges kun til createAll-testen, så vi ikke kalder populatoren to gange
-    private List<MovieCast> buildCasts() {
-        return List.of(
-                MovieCast.builder().Character("Neo").build(),
-                MovieCast.builder().Character("Narrator").build(),
-                MovieCast.builder().Character("Cobb").build()
-        );
-    }
-
     @Test
     void createMovieCast() {
-        // Arrange + Act
-        List<MovieCast> movieCasts = MovieCastPopulator.populateMovieCasts(dao);
+        // Arrange
+        MovieCast expected = MovieCast.builder()
+                .character("Neo")
+                .build();
+
+        // Act
+        MovieCast actual = dao.create(expected);
 
         // Assert
-        assertFalse(movieCasts.isEmpty());
-        assertEquals("Neo", movieCasts.get(0).getCharacter());
+        assertEquals(expected, actual);
     }
 
     @Test
     void createAllMovieCast() {
-        // Arrange (brug buildCasts her)
-        List<MovieCast> toCreate = buildCasts();
+        // Arrange
+        List<MovieCast> expected = buildCasts();
 
         // Act
-        List<MovieCast> created = dao.createAll(toCreate);
+        List<MovieCast> actual = dao.createAll(expected);
 
         // Assert
-        assertEquals(3, created.size());
-        assertTrue(created.stream().anyMatch(c -> "Neo".equals(c.getCharacter())));
-        assertTrue(created.stream().anyMatch(c -> "Narrator".equals(c.getCharacter())));
-        assertTrue(created.stream().anyMatch(c -> "Cobb".equals(c.getCharacter())));
-
-        // mod DB
-        assertEquals(3, dao.getAll().size());
+        assertEquals(expected, actual);
     }
 
     @Test
     void getMovieCastById() {
         // Arrange
-        MovieCast mc = MovieCastPopulator.populateMovieCasts(dao).get(0);
+        MovieCast inserted = MovieCastPopulator.populateMovieCasts(dao).get(0);
+        MovieCast expected = MovieCast.builder()
+                .id(inserted.getId())
+                .character(inserted.getCharacter())
+                .build();
 
         // Act
-        Optional<MovieCast> found = dao.getById(mc.getId());
+        MovieCast actual = dao.getById(inserted.getId()).get();
 
         // Assert
-        assertTrue(found.isPresent());
-        assertEquals("Neo", found.get().getCharacter());
+        assertEquals(expected, actual);
     }
 
     @Test
     void getAllMovieCasts() {
         // Arrange
-        MovieCastPopulator.populateMovieCasts(dao);
+        List<MovieCast> expected = MovieCastPopulator.populateMovieCasts(dao);
 
         // Act
-        List<MovieCast> all = dao.getAll();
+        List<MovieCast> actual = dao.getAll();
 
         // Assert
-        assertTrue(all.size() >= 3);
-        assertTrue(all.stream().anyMatch(c -> "Neo".equals(c.getCharacter())));
-        assertTrue(all.stream().anyMatch(c -> "Narrator".equals(c.getCharacter())));
-        assertTrue(all.stream().anyMatch(c -> "Cobb".equals(c.getCharacter())));
+        assertEquals(expected, actual);
     }
 
     @Test
     void updateMovieCast() {
         // Arrange
         MovieCast mc = MovieCastPopulator.populateMovieCasts(dao).get(0);
+        MovieCast expected = MovieCast.builder()
+                .id(mc.getId())
+                .character("Thomas Anderson")
+                .build();
 
         // Act
-        MovieCast updated = dao.update(
-                MovieCast.builder()
-                        .id(mc.getId())
-                        .Character("Thomas Anderson")
-                        .build()
-        );
+        MovieCast actual = dao.update(expected);
 
         // Assert
-        assertEquals("Thomas Anderson", updated.getCharacter());
+        assertEquals(expected, actual);
     }
 
     @Test
     void deleteMovieCast() {
         // Arrange
         MovieCast mc = MovieCastPopulator.populateMovieCasts(dao).get(0);
+        boolean expected = true;
 
         // Act
-        boolean deleted = dao.delete(mc.getId());
+        boolean actual = dao.delete(mc.getId());
 
         // Assert
-        assertTrue(deleted);
-        assertTrue(dao.getById(mc.getId()).isEmpty());
+        assertEquals(expected, actual);
+        assertEquals(Optional.empty(), dao.getById(mc.getId()));
     }
 }

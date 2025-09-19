@@ -31,4 +31,13 @@ public class MoviePopulator {
 
         return List.of(m1, m2, m3);
     }
+
+    public static List<Movie> buildMovies() {
+        return List.of(
+                Movie.builder().title("The Matrix").build(),
+                Movie.builder().title("Fight Club").build(),
+                Movie.builder().title("Inception").build()
+        );
+    }
+
 }

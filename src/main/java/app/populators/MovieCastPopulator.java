@@ -12,13 +12,13 @@ public class MovieCastPopulator {
     public static List<MovieCast> populateMovieCasts(MovieCastDAO castDAO) {
 
         MovieCast c1 = MovieCast.builder()
-                .Character("Neo")
+                .character("Neo")
                 .build();
         MovieCast c2 = MovieCast.builder()
-                .Character("Narrator")
+                .character("Narrator")
                 .build();
         MovieCast c3 = MovieCast.builder()
-                .Character("Cobb")
+                .character("Cobb")
                 .build();
 
         castDAO.create(c1);
@@ -27,4 +27,13 @@ public class MovieCastPopulator {
 
         return List.of(c1, c2, c3);
     }
+
+    public static List<MovieCast> buildCasts() {
+        return List.of(
+                MovieCast.builder().character("Neo").build(),
+                MovieCast.builder().character("Narrator").build(),
+                MovieCast.builder().character("Cobb").build()
+        );
+    }
+
 }

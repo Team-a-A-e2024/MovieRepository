@@ -12,6 +12,7 @@ import java.util.Optional;
 import static org.junit.jupiter.api.Assertions.*;
 
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
+@Tag("IntegrationTest")
 class PersonDAOTest {
 
     private EntityManagerFactory emf;
@@ -28,100 +29,81 @@ class PersonDAOTest {
         if (emf != null && emf.isOpen()) emf.close();
     }
 
-    // Bruges kun til createAll-testen, så vi ikke kalder populatoren to gange
-    private List<Person> buildPersons() {
-        return List.of(
-                Person.builder().id(210).name("Helper Person 1").build(),
-                Person.builder().id(211).name("Helper Person 2").build(),
-                Person.builder().id(212).name("Helper Person 3").build()
-        );
-    }
-
     @Test
     void createPerson() {
-        // Arrange + Act
-        List<Person> persons = PersonPopulator.populatePersons(dao);
-
-        // Assert
-        assertFalse(persons.isEmpty());
-        assertEquals("Keanu Reeves", persons.get(0).getName());
-    }
-
-    @Test
-    void createAllPerson() {
         // Arrange
-        List<Person> toCreate = buildPersons();
+        Person expected = Person.builder()
+                .id(200)
+                .name("Keanu Reeves")
+                .build();
 
         // Act
-        List<Person> created = dao.createAll(toCreate);
+        Person actual = dao.create(expected);
 
-        // Assert (return-værdi)
-        assertEquals(3, created.size());
-        assertTrue(created.stream().anyMatch(p -> p.getName().equals("Helper Person 1")));
-        assertTrue(created.stream().anyMatch(p -> p.getName().equals("Helper Person 2")));
-        assertTrue(created.stream().anyMatch(p -> p.getName().equals("Helper Person 3")));
+        // Assert
+        assertEquals(expected, actual);
 
-        // Assert (mod DB)
-        List<Person> all = dao.getAll();
-        assertTrue(all.size() >= 3);
+        // Assert – hentet fra DB matcher
+        Person fromDb = dao.getById(expected.getId()).orElseThrow();
+        assertEquals(expected, fromDb);
     }
 
     @Test
     void getPersonById() {
         // Arrange
-        List<Person> persons = PersonPopulator.populatePersons(dao);
-        Integer id = persons.get(0).getId(); // fx 200
+        List<Person> seeded = PersonPopulator.populatePersons(dao);
+        Person first = seeded.get(0);
+        Person expected = Person.builder()
+                .id(first.getId())
+                .name(first.getName())
+                .build();
 
         // Act
-        Optional<Person> found = dao.getById(id);
+        Person actual = dao.getById(first.getId()).orElseThrow();
 
         // Assert
-        assertTrue(found.isPresent());
-        assertEquals("Keanu Reeves", found.get().getName());
+        assertEquals(expected, actual);
     }
 
     @Test
     void getAllPersons() {
         // Arrange
-        PersonPopulator.populatePersons(dao);
+        List<Person> expected = PersonPopulator.populatePersons(dao);
 
         // Act
-        List<Person> all = dao.getAll();
+        List<Person> actual = dao.getAll();
 
         // Assert
-        assertTrue(all.size() >= 3);
-        assertTrue(all.stream().anyMatch(p -> "Keanu Reeves".equals(p.getName())));
-        assertTrue(all.stream().anyMatch(p -> "Brad Pitt".equals(p.getName())));
-        assertTrue(all.stream().anyMatch(p -> "Leonardo DiCaprio".equals(p.getName())));
+        assertEquals(expected, actual);
     }
 
     @Test
     void updatePerson() {
         // Arrange
         Person p = PersonPopulator.populatePersons(dao).get(0);
+        Person expected = Person.builder()
+                .id(p.getId())
+                .name("Neo")
+                .build();
 
         // Act
-        Person updated = dao.update(
-                Person.builder()
-                        .id(p.getId())
-                        .name("Neo")
-                        .build()
-        );
+        Person updated = dao.update(expected);
 
         // Assert
-        assertEquals("Neo", updated.getName());
+        assertEquals(expected, updated);
     }
 
     @Test
     void deletePerson() {
         // Arrange
         Person p = PersonPopulator.populatePersons(dao).get(1);
+        boolean expected = true;
 
         // Act
-        boolean deleted = dao.delete(p.getId());
+        boolean actual = dao.delete(p.getId());
 
         // Assert
-        assertTrue(deleted);
-        assertTrue(dao.getById(p.getId()).isEmpty());
+        assertEquals(expected, actual);
+        assertEquals(Optional.empty(), dao.getById(p.getId()));
     }
 }

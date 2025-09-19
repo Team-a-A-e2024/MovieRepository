@@ -11,17 +11,9 @@ import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.*;
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
+@Tag("IntegrationTest")
 
 class GenreDAOTest {
-
-
-    static List<Genre> buildGenres() {
-        return List.of(
-                Genre.builder().id(1).genre("Action").build(),
-                Genre.builder().id(2).genre("Comedy").build(),
-                Genre.builder().id(3).genre("Drama").build()
-        );
-    }
 
     private static EntityManagerFactory emf;
     private static GenreDAO dao;
@@ -40,91 +32,99 @@ class GenreDAOTest {
 
     @Test
     void createGenre() {
-        // Arrange + Act
-        List<Genre> genres = GenrePopulator.populateGenres(dao);
+        // Arrange
+        Genre expected = Genre.builder()
+                .id(100)
+                .genre("Action")
+                .build();
+
+        // Act
+        Genre actual = dao.create(expected);
 
         // Assert
-        assertFalse(genres.isEmpty());
-        assertEquals("Action", genres.get(0).getGenre());
+        assertEquals(expected, actual);
+
+        // Assert – hentet fra DB matcher
+        Genre fromDb = dao.getById(100).orElseThrow();
+        assertEquals(expected, fromDb);
     }
 
     @Test
-    void createAllGenre() {
+    void createAllGenres() {
         // Arrange
-        List<Genre> toCreate = buildGenres();
+        Genre expected1 = Genre.builder().id(201).genre("Action").build();
+        Genre expected2 = Genre.builder().id(202).genre("Comedy").build();
+        Genre expected3 = Genre.builder().id(203).genre("Drama").build();
+        List<Genre> expected = List.of(expected1, expected2, expected3);
 
         // Act
-        List<Genre> created = dao.createAll(toCreate);
+        List<Genre> actual = dao.createAll(expected);
 
-        // Assert (return-værdi)
-        assertEquals(3, created.size());
-        assertTrue(created.stream().anyMatch(g -> g.getGenre().equals("Action")));
-        assertTrue(created.stream().anyMatch(g -> g.getGenre().equals("Comedy")));
-        assertTrue(created.stream().anyMatch(g -> g.getGenre().equals("Drama")));
-
-        // Assert (mod DB)
-        List<Genre> all = dao.getAll();
-        assertEquals(3, all.size());
+        // Assert
+        assertEquals(expected, actual);
+        assertEquals(dao.getAll(), actual);
     }
 
     @Test
     void getGenreById() {
         // Arrange
         GenrePopulator.populateGenres(dao);
+        Genre expected = Genre.builder()
+                .id(1)
+                .genre("Action")
+                .build();
 
         // Act
-        Optional<Genre> genre = dao.getById(1);
+        Genre actual = dao.getById(1).get();
 
         // Assert
-        assertTrue(genre.isPresent());
-        assertEquals("Action", genre.get().getGenre());
+        assertEquals(expected, actual);
     }
 
     @Test
     void getAllGenres() {
         // Arrange
         GenrePopulator.populateGenres(dao);
+        List<Genre> expected = List.of(
+                Genre.builder().id(1).genre("Action").build(),
+                Genre.builder().id(2).genre("Comedy").build(),
+                Genre.builder().id(3).genre("Drama").build()
+        );
 
         // Act
-        List<Genre> allGenres = dao.getAll();
+        List<Genre> actual = dao.getAll();
 
         // Assert
-        assertEquals(3, allGenres.size());
-        assertTrue(allGenres.stream().anyMatch(g -> g.getGenre().equals("Action")));
-        assertTrue(allGenres.stream().anyMatch(g -> g.getGenre().equals("Comedy")));
-        assertTrue(allGenres.stream().anyMatch(g -> g.getGenre().equals("Drama")));
+        assertEquals(expected, actual);
     }
 
     @Test
     void updateGenre() {
-    // Arrange
-    List<Genre> genres = GenrePopulator.populateGenres(dao);
-    Genre g = genres.get(0);
+        // Arrange
+        Genre g = GenrePopulator.populateGenres(dao).get(0);
+        Genre expected = Genre.builder()
+                .id(g.getId())
+                .genre("Adventure")
+                .build();
 
-    // Act
-    Genre updated = dao.update(
-            Genre.builder()
-                    .id(g.getId())
-                    .genre("Adventure")
-                    .build()
-    );
+        // Act
+        Genre actual = dao.update(expected);
 
-    // Assert
-    assertEquals("Adventure", updated.getGenre());
-}
+        // Assert
+        assertEquals(expected, actual);
+    }
 
     @Test
     void deleteGenre() {
         // Arrange
-        List<Genre> genres = GenrePopulator.populateGenres(dao);
-        Genre g = genres.get(0);
+        Genre g = GenrePopulator.populateGenres(dao).get(0);
+        boolean expected = true;
 
         // Act
-        boolean deleted = dao.delete(g.getId());
+        boolean actual = dao.delete(g.getId());
 
         // Assert
-        assertTrue(deleted);
+        assertEquals(expected, actual);
         assertTrue(dao.getById(g.getId()).isEmpty());
     }
-
 }
