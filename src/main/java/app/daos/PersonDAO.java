@@ -29,12 +29,10 @@ public class PersonDAO implements IDao<Person, Integer> {
                     existing = p;
                 }
                 em.getTransaction().commit();
-
                 return existing;
             } catch (DatabaseException e) {
                 em.getTransaction().rollback();
             }
-
             return null;
         }
     }
