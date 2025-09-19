@@ -14,5 +14,6 @@ public class CreditsDTO {
     @JsonProperty("id")
     private int id;
     private List<CastDTO> cast;
+    private List<CrewDTO> crew;
 
 }

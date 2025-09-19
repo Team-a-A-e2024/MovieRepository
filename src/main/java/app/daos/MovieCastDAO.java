@@ -1,5 +1,6 @@
 package app.daos;
 
+import app.dtos.MovieDTO;
 import app.entities.MovieCast;
 import app.exceptions.DatabaseException;
 import app.persistence.IDao;
@@ -40,9 +41,24 @@ public class MovieCastDAO implements IDao<MovieCast, Integer> {
                 em.getTransaction().begin();
                 for (MovieCast movieCast : movieCastList) {
                     try {
-                        em.persist(movieCast);
-                        movieCasts.add(movieCast);
+                        MovieCast managed;
+
+                        if (movieCast.getId() != null) {
+                            MovieCast existing = em.find(MovieCast.class, movieCast.getId());
+                            if (existing != null) {
+                                managed = em.merge(movieCast);
+                            } else {
+                                em.persist(movieCast);
+                                managed = movieCast;
+                            }
+                        } else {
+                            em.persist(movieCast);
+                            managed = movieCast;
+                        }
+
+                        movieCasts.add(managed);
                     } catch (Exception e) {
+                        System.out.println(e.getMessage());
                     }
                 }
                 em.getTransaction().commit();

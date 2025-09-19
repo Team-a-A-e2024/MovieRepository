@@ -2,6 +2,7 @@ package app.utils;
 
 import app.dtos.CastDTO;
 import app.dtos.CreditsDTO;
+import app.dtos.CrewDTO;
 import app.entities.Movie;
 import app.entities.MovieCast;
 import app.entities.Person;
@@ -11,7 +12,7 @@ import java.util.List;
 
 public class MovieCastMapper {
 
-    public static List<MovieCast> CastDTOtoMovieCastEntity(List<CastDTO> castDTOs, Movie movie) {
+    public static List<MovieCast> castDTOtoMovieCastEntity(List<CastDTO> castDTOs, Movie movie) {
         List<MovieCast> movieCasts = new ArrayList<>();
 
         for (CastDTO cast : castDTOs) {
@@ -21,8 +22,6 @@ public class MovieCastMapper {
                     .build();
 
             movieCasts.add(MovieCast.builder()
-                    .job(cast.getJob())
-                    .department(cast.getDepartment())
                     .character(cast.getCharacter())
                     .movie(movie)
                     .person(person)
@@ -32,14 +31,47 @@ public class MovieCastMapper {
 
         return movieCasts;
     }
-    public static List<MovieCast> CreditsDTOToMovieCastEntity(CreditsDTO creditsDTO, List<Movie> movies){
-        Movie resultMovie = null;
+
+    public static List<MovieCast> mapCrewDTOsToMovieCast(List<CrewDTO> crewDTOs, Movie movie) {
+        List<MovieCast> movieCasts = new ArrayList<>();
+
+        for (CrewDTO crew : crewDTOs) {
+            Person person = Person.builder()
+                    .id(crew.getId())
+                    .name(crew.getName())
+                    .build();
+
+            movieCasts.add(MovieCast.builder()
+                    .job(crew.getJob())
+                    .department(crew.getDepartment())
+                    .person(person)
+                    .build());
+        }
+
+        return movieCasts;
+    }
+
+    public static List<MovieCast> creditsDTOToMovieCastEntity(CreditsDTO creditsDTO, List<Movie> movies){
+        List<MovieCast> movieCasts = new ArrayList<>();
+
         for(Movie movie : movies){
             if(movie.getId()==creditsDTO.getId()){
-                resultMovie = movie;
+                movieCasts.addAll(castDTOtoMovieCastEntity(creditsDTO.getCast(),movie));
+                movieCasts.addAll(mapCrewDTOsToMovieCast(creditsDTO.getCrew(), movie));
                 break;
             }
         }
-        return CastDTOtoMovieCastEntity(creditsDTO.getCast(),resultMovie);
+
+        return movieCasts;
+    }
+
+    public static List<MovieCast> creditsDTOListToMovieCastList(List<CreditsDTO> creditsDTOs, List<Movie> movies) {
+        List<MovieCast> movieCasts = new ArrayList<>();
+
+        creditsDTOs.forEach(credits -> {
+            movieCasts.addAll(creditsDTOToMovieCastEntity(credits, movies));
+        });
+
+        return movieCasts;
     }
 }
