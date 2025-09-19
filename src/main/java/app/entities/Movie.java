@@ -25,13 +25,19 @@ public class Movie {
     private String overview;
 
     //relations
-    @OneToMany (mappedBy = "movie", cascade = CascadeType.ALL, fetch = FetchType.EAGER)
+    @OneToMany (mappedBy = "movie", cascade = CascadeType.ALL)
     @Builder.Default
+    @ToString.Exclude
     @EqualsAndHashCode.Exclude
     private Set<MovieCast> casts = new HashSet<>();
 
     @ManyToMany (fetch = FetchType.EAGER)
     @Builder.Default
+    @JoinTable(
+            name = "movie_genre",
+            joinColumns = { @JoinColumn(name = "movies_id") },
+            inverseJoinColumns = { @JoinColumn(name = "genres_id") }
+    )
     private Set<Genre> genres = new HashSet<>();
 
     //bi-directional functions
