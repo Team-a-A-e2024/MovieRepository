@@ -2,126 +2,98 @@ package app.daos;
 
 import app.config.HibernateConfig;
 import app.entities.Movie;
-import app.populators.MoviePopulator;
+import app.populators.MoviePopulatorTest;
+import jakarta.persistence.EntityManager;
 import jakarta.persistence.EntityManagerFactory;
 import org.junit.jupiter.api.*;
 
 import java.util.List;
-import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.*;
 
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
+@Tag("IntegrationTest")
 class MovieDAOTest {
 
-    private EntityManagerFactory emf;
-    private MovieDAO dao;
+    private static EntityManagerFactory emf;
+    private MovieDAO movieDAO;
+
+    @BeforeAll
+    void setupOnce() {
+        HibernateConfig.setTest(true);
+        emf = HibernateConfig.getEntityManagerFactoryForTest();
+    }
+
+    @AfterAll
+    void tearDownOnce() {
+        if (emf != null) emf.close();
+    }
 
     @BeforeEach
     void setup() {
-        emf = HibernateConfig.getEntityManagerFactoryForTest();
-        dao = new MovieDAO(emf);
-    }
+        movieDAO = new MovieDAO(emf);
+        EntityManager em = emf.createEntityManager();
+        em.getTransaction().begin();
+        em.createQuery("DELETE FROM Movie").executeUpdate();
+        em.getTransaction().commit();
 
-    @AfterEach
-    void teardown() {
-        if (emf != null && emf.isOpen()) emf.close();
-    }
-
-    // Bruges kun til createAll-testen, så vi ikke kalder populatoren to gange
-    private List<Movie> buildMovies() {
-        return List.of(
-                Movie.builder().title("The Matrix").build(),
-                Movie.builder().title("Fight Club").build(),
-                Movie.builder().title("Inception").build()
-        );
+        MoviePopulatorTest.populate(em);
+        em.close();
     }
 
     @Test
-    void createMovie() {
-        // Arrange + Act (brug populator til at indsætte standardfilm)
-        List<Movie> movies = MoviePopulator.populateMovies(dao);
+    void searchByTitle() {
+        List<Movie> results = movieDAO.searchByTitle("The Matrix");
 
-        // Assert (simpelt tjek på første element)
-        assertFalse(movies.isEmpty());
-        assertNotNull(movies.get(0).getId());
-        assertNotNull(movies.get(0).getTitle());
+        assertNotNull(results);
+        assertEquals(1, results.size());
+
+        Movie movie = results.get(0);
+        assertEquals(MoviePopulatorTest.matrix, movie);
     }
 
     @Test
-    void createAllMovies() {
-        // Arrange
-        List<Movie> toCreate = buildMovies();
+    void testGetAverageRating() {
+        double avg = movieDAO.getAverageRating();
+        double expected = (MoviePopulatorTest.matrix.getRating()
+                + MoviePopulatorTest.inception.getRating()
+                + MoviePopulatorTest.room.getRating()
+                + MoviePopulatorTest.frozen.getRating()) / 4.0;
 
-        // Act
-        List<Movie> created = dao.createAll(toCreate);
-
-        // Assert (returværdi + DB)
-        assertEquals(3, created.size());
-        assertTrue(created.stream().anyMatch(m -> "The Matrix".equals(m.getTitle())));
-        assertTrue(created.stream().anyMatch(m -> "Fight Club".equals(m.getTitle())));
-        assertTrue(created.stream().anyMatch(m -> "Inception".equals(m.getTitle())));
-        assertEquals(3, dao.getAll().size());
+        assertEquals(expected, avg, 0.001);
     }
 
     @Test
-    void getMovieById() {
-        // Arrange
-        List<Movie> seeded = MoviePopulator.populateMovies(dao);
-        Movie first = seeded.get(0);
+    void testTopRatedMovies() {
+        List<Movie> results = movieDAO.getTop10HighestRated();
 
-        // Act
-        Optional<Movie> found = dao.getById(first.getId());
+        assertEquals(4, results.size());
 
-        // Assert
-        assertTrue(found.isPresent());
-        assertEquals(first.getTitle(), found.get().getTitle());
+        Movie m1 = results.get(0);
+        Movie m2 = results.get(1);
+        Movie m3 = results.get(2);
+        Movie m4 = results.get(3);
+
+        assertEquals(MoviePopulatorTest.matrix, m1);
+        assertEquals(MoviePopulatorTest.inception, m2);
+        assertEquals(MoviePopulatorTest.frozen, m3);
+        assertEquals(MoviePopulatorTest.room, m4);
     }
 
     @Test
-    void getAllMovies() {
-        // Arrange
-        List<Movie> seeded = MoviePopulator.populateMovies(dao);
+    void testLowestRatedMovies() {
+        List<Movie> results = movieDAO.getTop10LowestRated();
 
-        // Act
-        List<Movie> all = dao.getAll();
+        assertEquals(4, results.size());
 
-        // Assert
-        assertEquals(seeded.size(), all.size());
-        for (Movie m : seeded) {
-            assertTrue(all.stream().anyMatch(x -> x.getTitle().equals(m.getTitle())));
-        }
-    }
+        Movie m1 = results.get(0);
+        Movie m2 = results.get(1);
+        Movie m3 = results.get(2);
+        Movie m4 = results.get(3);
 
-    @Test
-    void updateMovie() {
-        // Arrange
-        Movie original = MoviePopulator.populateMovies(dao).get(0);
-
-        // Act
-        Movie updated = dao.update(
-                Movie.builder()
-                        .id(original.getId())
-                        .title(original.getTitle() + " (Updated)")
-                        .build()
-        );
-
-        // Assert
-        assertNotNull(updated);
-        assertEquals(original.getId(), updated.getId());
-        assertEquals(original.getTitle() + " (Updated)", updated.getTitle());
-    }
-
-    @Test
-    void deleteMovie() {
-        // Arrange
-        Movie m = MoviePopulator.populateMovies(dao).get(0);
-
-        // Act
-        boolean deleted = dao.delete(m.getId());
-
-        // Assert
-        assertTrue(deleted);
-        assertTrue(dao.getById(m.getId()).isEmpty());
+        assertEquals(MoviePopulatorTest.room, m1);
+        assertEquals(MoviePopulatorTest.frozen, m2);
+        assertEquals(MoviePopulatorTest.inception, m3);
+        assertEquals(MoviePopulatorTest.matrix, m4);
     }
 }
