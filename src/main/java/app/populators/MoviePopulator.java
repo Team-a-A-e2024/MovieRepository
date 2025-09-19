@@ -39,5 +39,4 @@ public class MoviePopulator {
                 Movie.builder().title("Inception").build()
         );
     }
-
 }
