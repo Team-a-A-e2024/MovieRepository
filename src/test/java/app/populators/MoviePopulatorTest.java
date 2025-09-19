@@ -13,6 +13,7 @@ public class MoviePopulatorTest {
     public static void populate(EntityManager em) {
         em.getTransaction().begin();
         matrix = Movie.builder()
+                .id(0)
                 .title("The Matrix")
                 .imdbID("tt0133093")
                 .rating(8.7)
@@ -21,6 +22,7 @@ public class MoviePopulatorTest {
                 .build();
 
         inception = Movie.builder()
+                .id(1)
                 .title("Inception")
                 .imdbID("tt1375666")
                 .rating(8.5)
@@ -29,6 +31,7 @@ public class MoviePopulatorTest {
                 .build();
 
         room = Movie.builder()
+                .id(2)
                 .title("The Room")
                 .imdbID("tt0368226")
                 .rating(3.7)
@@ -37,6 +40,7 @@ public class MoviePopulatorTest {
                 .build();
 
         frozen = Movie.builder()
+                .id(3)
                 .title("Frozen")
                 .imdbID("tt2294629")
                 .rating(7.5)
