@@ -7,11 +7,8 @@ import app.populators.MoviePopulatorTest;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.EntityManagerFactory;
 import org.junit.jupiter.api.*;
-
 import java.util.List;
 import java.util.Optional;
-
-import static app.populators.MoviePopulator.buildMovies;
 import static org.junit.jupiter.api.Assertions.*;
 
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
@@ -47,6 +44,7 @@ class MovieDAOTest {
     void createMovie() {
         // Arrange
         Movie expected = Movie.builder()
+                .id(100)
                 .title("The Matrix")
                 .build();
 
@@ -64,7 +62,15 @@ class MovieDAOTest {
     @Test
     void createAllMovies() {
         // Arrange
-        List<Movie> expected = buildMovies();
+        List<Movie> expected = List.of(Movie.builder()
+                .id(115)
+                .title("Vaiana")
+                .build(),
+
+        Movie.builder()
+                .id(116)
+                .title("Paw Patrol")
+                .build());
 
         // Act
         List<Movie> actual = dao.createAll(expected);
@@ -89,7 +95,7 @@ class MovieDAOTest {
     @Test
     void getAllMovies() {
         // Arrange
-        List<Movie> expected = MoviePopulator.populateMovies(dao);
+        List<Movie> expected = List.of(MoviePopulatorTest.matrix, MoviePopulatorTest.inception, MoviePopulatorTest.room, MoviePopulatorTest.frozen);
 
         // Act
         List<Movie> actual = dao.getAll();

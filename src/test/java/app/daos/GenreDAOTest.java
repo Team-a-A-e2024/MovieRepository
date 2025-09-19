@@ -3,30 +3,42 @@ package app.daos;
 import app.config.HibernateConfig;
 import app.entities.Genre;
 import app.populators.GenrePopulator;
+import jakarta.persistence.EntityManager;
 import jakarta.persistence.EntityManagerFactory;
 import org.junit.jupiter.api.*;
-
 import java.util.List;
-import java.util.Optional;
-
 import static org.junit.jupiter.api.Assertions.*;
+
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 @Tag("IntegrationTest")
-
 class GenreDAOTest {
 
     private static EntityManagerFactory emf;
     private static GenreDAO dao;
 
-    @BeforeEach
-    void setup() {
+    @BeforeAll
+    void setupOnce() {
+        HibernateConfig.setTest(true);
         emf = HibernateConfig.getEntityManagerFactoryForTest();
         dao = new GenreDAO(emf);
     }
 
-    @AfterEach
-    void teardown() {
-        if (emf != null && emf.isOpen()) emf.close();
+    @AfterAll
+    void tearDownOnce() {
+        if (emf != null) emf.close();
+    }
+
+    @BeforeEach
+    void setup() {
+            try (EntityManager em = emf.createEntityManager()) {
+                em.getTransaction().begin();
+                em.createNativeQuery("TRUNCATE TABLE genre RESTART IDENTITY CASCADE")
+                        .executeUpdate();
+                em.getTransaction().commit();
+            }
+            catch (Exception e) {
+                e.printStackTrace();
+            }
     }
 
     @Test

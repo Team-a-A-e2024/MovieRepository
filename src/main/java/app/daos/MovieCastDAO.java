@@ -1,6 +1,7 @@
 package app.daos;
 
 import app.entities.MovieCast;
+import app.entities.Person;
 import app.exceptions.DatabaseException;
 import app.persistence.IDao;
 import jakarta.persistence.EntityManager;

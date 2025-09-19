@@ -5,6 +5,7 @@ import app.entities.Movie;
 import app.entities.MovieCast;
 import app.entities.Person;
 import app.populators.MovieCastPopulator;
+import jakarta.persistence.EntityManager;
 import jakarta.persistence.EntityManagerFactory;
 import org.junit.jupiter.api.*;
 
@@ -28,17 +29,30 @@ class MovieCastDAOTest {
 
     @BeforeEach
     void setup() {
+        try (EntityManager em = emf.createEntityManager()) {
+            em.getTransaction().begin();
+            em.createNativeQuery("TRUNCATE TABLE moviecast, movie, person RESTART IDENTITY CASCADE")
+                    .executeUpdate();
+            em.getTransaction().commit();
+        }
+        catch (Exception e) {
+            e.printStackTrace();
+        }
+        movie = movieDao.create(Movie.builder().id(1).title("The Matrix").build());
+        person = personDao.create(Person.builder().id(2).name("Keanu Reeves").build());
+    }
+
+    @BeforeAll
+    void setupOnce() {
         emf = HibernateConfig.getEntityManagerFactoryForTest();
         dao = new MovieCastDAO(emf);
 
         movieDao = new MovieDAO(emf);
         personDao = new PersonDAO(emf);
-
-        movie = movieDao.create(Movie.builder().title("The Matrix").build());
-        person = personDao.create(Person.builder().id(1).name("Keanu Reeves").build());
     }
 
-    @AfterEach
+
+    @AfterAll
     void teardown() {
         if (emf != null && emf.isOpen()) emf.close();
     }

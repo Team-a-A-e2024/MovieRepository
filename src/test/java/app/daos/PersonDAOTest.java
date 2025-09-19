@@ -3,6 +3,7 @@ package app.daos;
 import app.config.HibernateConfig;
 import app.entities.Person;
 import app.populators.PersonPopulator;
+import jakarta.persistence.EntityManager;
 import jakarta.persistence.EntityManagerFactory;
 import org.junit.jupiter.api.*;
 
@@ -20,11 +21,24 @@ class PersonDAOTest {
 
     @BeforeEach
     void setup() {
+        try (EntityManager em = emf.createEntityManager()) {
+            em.getTransaction().begin();
+            em.createNativeQuery("TRUNCATE TABLE person RESTART IDENTITY CASCADE")
+                    .executeUpdate();
+            em.getTransaction().commit();
+        }
+        catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+    @BeforeAll
+    void setupOnce() {
         emf = HibernateConfig.getEntityManagerFactoryForTest();
         dao = new PersonDAO(emf);
     }
 
-    @AfterEach
+    @AfterAll
     void teardown() {
         if (emf != null && emf.isOpen()) emf.close();
     }
