@@ -26,9 +26,11 @@ public class PersonDAO implements IDao<Person, Integer> {
                 Person existing = em.find(Person.class, p.getId());
                 if (existing == null){
                     em.persist(p);
-                    return p;
+                    existing = p;
                 }
                 em.getTransaction().commit();
+
+                return existing;
             } catch (DatabaseException e) {
                 em.getTransaction().rollback();
             }
