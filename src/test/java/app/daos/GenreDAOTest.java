@@ -6,6 +6,7 @@ import app.populators.GenrePopulator;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.EntityManagerFactory;
 import org.junit.jupiter.api.*;
+
 import java.util.List;
 import static org.junit.jupiter.api.Assertions.*;
 

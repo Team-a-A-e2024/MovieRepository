@@ -7,6 +7,7 @@ import app.populators.MoviePopulatorTest;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.EntityManagerFactory;
 import org.junit.jupiter.api.*;
+
 import java.util.List;
 import java.util.Optional;
 import static org.junit.jupiter.api.Assertions.*;
@@ -133,7 +134,6 @@ class MovieDAOTest {
         assertEquals(expected, actual);
         assertEquals(Optional.empty(), dao.getById(m.getId()));
     }
-
 
     @Test
     void searchByTitle() {

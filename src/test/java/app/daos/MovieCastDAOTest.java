@@ -51,7 +51,6 @@ class MovieCastDAOTest {
         personDao = new PersonDAO(emf);
     }
 
-
     @AfterAll
     void teardown() {
         if (emf != null && emf.isOpen()) emf.close();
