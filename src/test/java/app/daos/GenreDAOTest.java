@@ -29,7 +29,6 @@ class GenreDAOTest {
         if (emf != null && emf.isOpen()) emf.close();
     }
 
-
     @Test
     void createGenre() {
         // Arrange
