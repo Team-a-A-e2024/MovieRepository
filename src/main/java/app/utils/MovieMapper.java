@@ -37,4 +37,31 @@ public class MovieMapper {
         }
         return movies;
     }
+
+    public static List<Movie> mapMovieDTOtoMovieEntity(List<MovieDTO.Movie> movies, List<Genre> genres){
+        List<Movie> resultMovies = new ArrayList<>();
+
+        for(MovieDTO.Movie movie : movies){
+            Set<Genre> resultGenres = new HashSet<>();
+            for(Integer id : movie.getGenres()){
+                for(Genre genre : genres){
+                    if(genre.getId().equals(id)){
+                        resultGenres.add(genre);
+                        break;
+                    }
+                }
+            }
+
+            resultMovies.add(Movie.builder().
+                    id(movie.getId()).
+                    rating(movie.getRating()).
+                    releaseDate(movie.getReleaseDate()).
+                    title(movie.getTitle()).
+                    overview(movie.getOverview().substring(0,Math.min(movie.getOverview().length(),1024))).
+                    genres(resultGenres).
+                    build()
+            );
+        }
+        return resultMovies;
+    }
 }

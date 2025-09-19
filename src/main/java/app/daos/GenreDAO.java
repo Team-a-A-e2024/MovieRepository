@@ -1,8 +1,6 @@
 package app.daos;
 
 import app.entities.Genre;
-import app.entities.Movie;
-import app.exceptions.ApiException;
 import app.exceptions.DatabaseException;
 import app.persistence.IDao;
 import jakarta.persistence.EntityManager;
@@ -44,7 +42,7 @@ public class GenreDAO implements IDao<Genre, Integer> {
                     try {
                         em.persist(genre);
                         genres.add(genre);
-                    } catch (DatabaseException e) {
+                    } catch (Exception e) {
                     }
                 }
                 em.getTransaction().commit();
