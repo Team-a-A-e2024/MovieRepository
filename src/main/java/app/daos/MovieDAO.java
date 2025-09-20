@@ -2,10 +2,14 @@ package app.daos;
 
 import app.entities.Genre;
 import app.entities.Movie;
+import app.entities.Person;
 import app.exceptions.DatabaseException;
 import app.persistence.IDao;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.EntityManagerFactory;
+import jakarta.persistence.Query;
+import jakarta.persistence.TypedQuery;
+import org.hibernate.query.NativeQuery;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -71,8 +75,18 @@ public class MovieDAO implements IDao<Movie, Integer> {
 
     public List<Movie> getAllByGenre(Genre genre) {
         try (EntityManager em = emf.createEntityManager()) {
-            return em.createQuery("SELECT g.movies FROM Genre g where g.id = :value", Movie.class)
-                    .setParameter("value", genre.getId())
+            Query query = em.createNativeQuery("SELECT * from movie m inner join public.movie_genre mg on m.id = mg.movies_id where mg.genres_id = :value" , Movie.class)
+                    .setParameter("value", genre.getId());
+
+            System.out.println("det sutter" + query);
+            return (List<Movie>) query.getResultList();
+        }
+    }
+
+    public List<Movie> getAllByPerson(Person person) {
+        try (EntityManager em = emf.createEntityManager()) {
+            return em.createQuery("SELECT m FROM Person p join MovieCast c on c.person = p join Movie m on c.movie = m where p.id = :value", Movie.class)
+                    .setParameter("value", person.getId())
                     .getResultList();
         }
     }

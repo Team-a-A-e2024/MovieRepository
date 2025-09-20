@@ -1,15 +1,21 @@
 package app.daos;
 
 import app.config.HibernateConfig;
+import app.entities.Genre;
 import app.entities.Movie;
+import app.entities.MovieCast;
+import app.entities.Person;
 import app.populators.MoviePopulator;
 import app.populators.MoviePopulatorTest;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.EntityManagerFactory;
 import org.junit.jupiter.api.*;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
+
 import static org.junit.jupiter.api.Assertions.*;
 
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
@@ -35,7 +41,8 @@ class MovieDAOTest {
         dao = new MovieDAO(emf);
         EntityManager em = emf.createEntityManager();
         em.getTransaction().begin();
-        em.createQuery("DELETE FROM Movie").executeUpdate();
+        em.createNativeQuery("TRUNCATE TABLE moviecast, movie, person, genre RESTART IDENTITY CASCADE")
+                .executeUpdate();
         em.getTransaction().commit();
         MoviePopulatorTest.populate(em);
         em.close();
@@ -64,14 +71,14 @@ class MovieDAOTest {
     void createAllMovies() {
         // Arrange
         List<Movie> expected = List.of(Movie.builder()
-                .id(115)
-                .title("Vaiana")
-                .build(),
+                        .id(115)
+                        .title("Vaiana")
+                        .build(),
 
-        Movie.builder()
-                .id(116)
-                .title("Paw Patrol")
-                .build());
+                Movie.builder()
+                        .id(116)
+                        .title("Paw Patrol")
+                        .build());
 
         // Act
         List<Movie> actual = dao.createAll(expected);
@@ -189,5 +196,55 @@ class MovieDAOTest {
         assertEquals(MoviePopulatorTest.frozen, m2);
         assertEquals(MoviePopulatorTest.inception, m3);
         assertEquals(MoviePopulatorTest.matrix, m4);
+    }
+
+    @Test
+    void getAllByGenre() {
+        //arrange
+        Genre genre = Genre.builder().genre("test").id(1).build();
+        List<Movie> expected = List.of(
+                Movie.builder().id(2001).title("test1").build(),
+                Movie.builder().id(2002).title("test2").build()
+        );
+        expected.forEach(movie -> movie.addGenre(genre));
+        GenreDAO genreDAO = new GenreDAO(emf);
+        genreDAO.create(genre);
+        expected.forEach(dao::create);
+
+        //act
+        List<Movie> result = dao.getAllByGenre(Genre.builder().genre("test").id(1).build());
+
+        //assert
+        assertEquals(expected,result);
+    }
+
+    @Test
+    void getAllByPerson() {
+        //arrange
+        Person person = Person.builder().id(2000).build();
+        List<Movie> movies = List.of(
+                Movie.builder().id(2001).title("test1").build(),
+                Movie.builder().id(2002).title("test2").build()
+        );
+        //even if they are in the same movie in multiple roles the result will only have the movie appear once ;)
+        List<MovieCast> cast = List.of(
+                MovieCast.builder().movie(movies.get(0)).person(person).build(),
+                MovieCast.builder().movie(movies.get(1)).person(person).build(),
+                MovieCast.builder().movie(movies.get(1)).person(person).build()
+        );
+        PersonDAO personDAO = new PersonDAO(emf);
+        MovieCastDAO movieCastDAO = new MovieCastDAO(emf);
+
+        personDAO.create(person);
+        movies.forEach(dao::create);
+        cast.forEach(movieCastDAO::create);
+
+        List<Movie> expected = new ArrayList<>(movies);
+
+        //act
+        List<Movie> actual = dao.getAllByPerson(person);
+
+        //assert
+        assertEquals(expected,actual);
     }
 }

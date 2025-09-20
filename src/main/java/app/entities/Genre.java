@@ -21,6 +21,7 @@ public class Genre {
 
     //relation
     @ManyToMany (mappedBy = "genres")
+
     @Builder.Default
     @ToString.Exclude
     @EqualsAndHashCode.Exclude
